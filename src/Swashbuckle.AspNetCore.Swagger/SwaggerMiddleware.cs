@@ -7,30 +7,28 @@ using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Microsoft.OpenApi.Writers;
+using Microsoft.OpenApi.Models;
 
 namespace Swashbuckle.AspNetCore.Swagger
 {
     public class SwaggerMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly JsonSerializer _swaggerSerializer;
         private readonly SwaggerOptions _options;
         private readonly TemplateMatcher _requestMatcher;
 
         public SwaggerMiddleware(
             RequestDelegate next,
-            IOptions<MvcJsonOptions> mvcJsonOptionsAccessor,
             IOptions<SwaggerOptions> optionsAccessor)
-            : this(next, mvcJsonOptionsAccessor, optionsAccessor.Value)
+            : this(next, optionsAccessor.Value)
         { }
 
         public SwaggerMiddleware(
             RequestDelegate next,
-            IOptions<MvcJsonOptions> mvcJsonOptions,
             SwaggerOptions options)
         {
             _next = next;
-            _swaggerSerializer = SwaggerSerializerFactory.Create(mvcJsonOptions);
             _options = options ?? new SwaggerOptions();
             _requestMatcher = new TemplateMatcher(TemplateParser.Parse(options.RouteTemplate), new RouteValueDictionary());
         }
@@ -46,7 +44,7 @@ namespace Swashbuckle.AspNetCore.Swagger
             var basePath = string.IsNullOrEmpty(httpContext.Request.PathBase)
                 ? null
                 : httpContext.Request.PathBase.ToString();
-
+                
             try
             {
                 var swagger = swaggerProvider.GetSwagger(documentName, null, basePath);
@@ -82,16 +80,17 @@ namespace Swashbuckle.AspNetCore.Swagger
             response.StatusCode = 404;
         }
 
-        private async Task RespondWithSwaggerJson(HttpResponse response, SwaggerDocument swagger)
+        private async Task RespondWithSwaggerJson(HttpResponse response, OpenApiDocument swagger)
         {
             response.StatusCode = 200;
             response.ContentType = "application/json;charset=utf-8";
 
-            var jsonBuilder = new StringBuilder();
-            using (var writer = new StringWriter(jsonBuilder))
+            using (var textWriter = new StringWriter())
             {
-                _swaggerSerializer.Serialize(writer, swagger);
-                await response.WriteAsync(jsonBuilder.ToString(), new UTF8Encoding(false));
+                var jsonWriter = new OpenApiJsonWriter(textWriter);
+                if (_options.SerializeAsV2) swagger.SerializeAsV2(jsonWriter); else swagger.SerializeAsV3(jsonWriter);
+
+                await response.WriteAsync(textWriter.ToString(), new UTF8Encoding(false));
             }
         }
     }

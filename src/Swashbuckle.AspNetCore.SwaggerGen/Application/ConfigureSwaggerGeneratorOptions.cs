@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Swashbuckle.AspNetCore.SwaggerGen
@@ -39,7 +40,7 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
 
         public void DeepCopy(SwaggerGeneratorOptions source, SwaggerGeneratorOptions target)
         {
-            target.SwaggerDocs = new Dictionary<string, Info>(source.SwaggerDocs);
+            target.SwaggerDocs = new Dictionary<string, OpenApiInfo>(source.SwaggerDocs);
             target.DocInclusionPredicate = source.DocInclusionPredicate;
             target.IgnoreObsoleteActions = source.IgnoreObsoleteActions;
             target.ConflictingActionsResolver = source.ConflictingActionsResolver;
@@ -47,7 +48,7 @@ namespace Swashbuckle.AspNetCore.SwaggerGen
             target.TagsSelector = source.TagsSelector;
             target.SortKeySelector = source.SortKeySelector;
             target.DescribeAllParametersInCamelCase = source.DescribeAllParametersInCamelCase;
-            target.SecurityDefinitions = new Dictionary<string, SecurityScheme>(source.SecurityDefinitions);
+            target.SecuritySchemes = new Dictionary<string, OpenApiSecurityScheme>(source.SecuritySchemes);
             target.SecurityRequirements = new List<IDictionary<string, IEnumerable<string>>>(source.SecurityRequirements);
             target.ParameterFilters = new List<IParameterFilter>(source.ParameterFilters);
             target.OperationFilters = new List<IOperationFilter>(source.OperationFilters);

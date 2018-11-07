@@ -450,7 +450,7 @@ namespace Swashbuckle.AspNetCore.SwaggerGen.Test
         public void GetSwagger_GeneratesBasicAuthSecurityDefinition_IfSpecifiedBySettings()
         {
             var subject = Subject(setupAction: c =>
-                c.SecurityDefinitions.Add("basic", new BasicAuthScheme
+                c.SecuritySchemes.Add("basic", new BasicAuthScheme
                 {
                     Type = "basic",
                     Description = "Basic HTTP Authentication"
@@ -468,7 +468,7 @@ namespace Swashbuckle.AspNetCore.SwaggerGen.Test
         public void GetSwagger_GeneratesApiKeySecurityDefinition_IfSpecifiedBySettings()
         {
             var subject = Subject(setupAction: c =>
-                c.SecurityDefinitions.Add("apiKey", new ApiKeyScheme
+                c.SecuritySchemes.Add("apiKey", new ApiKeyScheme
                 {
                     Type = "apiKey",
                     Description = "API Key Authentication",
@@ -492,7 +492,7 @@ namespace Swashbuckle.AspNetCore.SwaggerGen.Test
         public void GetSwagger_GeneratesOAuthSecurityDefinition_IfSpecifiedBySettings()
         {
             var subject = Subject(setupAction: c =>
-                c.SecurityDefinitions.Add("oauth2", new OAuth2Scheme
+                c.SecuritySchemes.Add("oauth2", new OAuth2Scheme
                 {
                     Type = "oauth2",
                     Description = "OAuth2 Authorization Code Grant",
